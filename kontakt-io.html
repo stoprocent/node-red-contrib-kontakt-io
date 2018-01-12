@@ -217,7 +217,7 @@
             apikey: {type: "password"}
         },
         label: function() {
-          return this.desc || this.name
+          return this.name || this.desc
         },
         oneditprepare: function () {
           $("#node-config-input-apikey").change(function() {
