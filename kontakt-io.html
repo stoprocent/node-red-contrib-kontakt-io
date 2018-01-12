@@ -1,0 +1,231 @@
+
+<script type="text/x-red" data-template-name="kontakt.io-presence">
+    <div class="form-row">
+        <label for="node-input-account"><i class="fa fa-user"></i> Account</label>
+        <input type="text" id="node-input-account">
+    </div>
+    <div class="form-row">
+        <label for="node-input-source"><i class="fa fa-sign-out"></i> Source</label>
+        <select type="text" id="node-input-source" style="width:70%;">
+            <option value="receiver">Receiver</option>
+            <option value="place">Place</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-input-presenceID-row">
+        <label for="node-input-presenceID"><i class="fa fa-filter"></i> <span class="source-desc"></span></label>
+        <input type="text" id="node-input-presenceID" placeholder="ID">
+    </div>
+    <div class="form-row">
+        <label for="node-input-trackingID"><i class="fa fa-filter"></i> Tracking ID</label>
+        <input type="text" id="node-input-trackingID" placeholder="Tracking ID">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-proximity"><i class="fa fa-dot-circle-o"></i> Proximity</label>
+        <select type="text" id="node-input-proximity" style="width:70%;">
+            <option value="">...</option>
+            <option value="IMMEDIATE">Immediate</option>
+            <option value="NEAR">Near</option>
+            <option value="FAR">Far</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="kontakt.io-presence">
+    <p>Connects to a Kontakt.io API and subscribes to Location Engine events.</p>
+    <p>Changing <b>Source</b> will either deliver events from a single Receiver or from all Receivers assigned to a Place</p>
+    <h3>Details</h3>
+    <p>If no <b>Tracking ID</b> is provided <code>msg.payload</code> will include array of all devices visible to the Receiver/s.
+    <p><b>Tracking ID</b> and <b>Proximity</b> are optional input parameters. </p>
+    <p><b>Note: </b>If <b>Tracking ID</b> is specified <code>msg.payload</code> will contains just a single object:
+    <pre>
+{
+  timestamp: 1500000000,
+  sourceId: "ABCDE",
+  trackingId: "abcd",
+  rssi: -80,
+  proximity: "FAR",
+  scanType: "BLE",
+  deviceAddress: "FF:FF:FF:FF:FF:FF",
+}
+    </pre>
+
+    <p>See <a href="https://developer.kontakt.io/rest-api/api-guides/location-engine-monitoring/" target="new">Monitoring Location Engine Docs</a> for more details.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('kontakt.io-presence',{
+        category: 'input',
+        defaults: {
+            account: {type:"kontakt-io-account", required:true},
+            source: {value:"receiver", required:true},
+            presenceID: {value:"", required:true},
+            trackingID: {value:""},
+            proximity: {value:""},
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "kontaktio.png",
+        color: "#FFFFFF",
+        label: function() {
+            return this.name || "presence";
+        },
+        labelStyle: function() {
+            return (this.name)?"node_label_italic":"";
+        },
+        oneditprepare: function () {
+          $("#node-input-source").change(function() {
+            $("#node-input-presenceID-row .source-desc").html(( $( this ).val() === 'receiver') ? "Receiver ID" : "Place ID");
+          });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="kontakt.io-telemetry">
+    <div class="form-row">
+        <label for="node-input-account"><i class="fa fa-user"></i> Account</label>
+        <input type="text" id="node-input-account">
+    </div>
+    <div class="form-row">
+        <label for="node-input-stream"><i class="fa fa-sign-out"></i> Stream</label>
+        <select type="text" id="node-input-stream" style="width:70%;">
+            <option value="health">Health</option>
+            <option value="accelerometer">Accelerometer</option>
+            <option value="sensor">Sensor</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-uniqueID"><i class="fa fa-dot-circle-o"></i> Unique ID</label>
+        <input type="text" id="node-input-uniqueID" placeholder="Unique ID">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="kontakt.io-telemetry">
+    <p>Connects to a Kontakt.io API and subscribes to live telemetry streams from a single device.</p>
+    <h3>Streams</h3>
+    <dl class="message-properties">
+       <dt>Health</dt>
+       <dd>Data about beacon's battery life and RTC.</dd>
+       <dt>Accelerometer</dt>
+       <dd>Information about raw accelerometer readings and accelerometer-based events.</dd>
+       <dt>Sensor</dt>
+       <dd>Readings from sensors other than the accelerometer.</dd>
+    </dl>
+
+    <p>See <a href="https://developer.kontakt.io/rest-api/api-guides/telemetry/telemetry-streams/" target="new">Live Telemetry Streams</a> for more details.</p>
+
+    <p><b>Note:</b> Depending on <b>Stream</b> selection <code>msg.payload</code> will contains different objects.</p>
+    
+    <h3>Health</h3>
+<pre>
+{
+    "deviceUtcTime": 1503297853,
+    "batteryLevel": 56,
+    "externalPower": false
+}
+</pre>
+
+    <h3>Accelerometer</h3>
+    <pre>
+{
+    "sensitivity": 16,
+    "x": 0,
+    "y": -30,
+    "z": 5,
+    "lastDoubleTap": 120,
+    "lastThreshold": 15
+}
+</pre>
+
+    <h3>Sensor</h3>
+<pre>
+{
+    "lightLevel": 56,
+    "temperature": 26
+}
+</pre>
+    
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('kontakt.io-telemetry',{
+        category: 'input',
+        defaults: {
+            account: {type:"kontakt-io-account", required:true},
+            uniqueID: {value:"", required:true},
+            stream: {value:"", required:true},
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "kontaktio.png",
+        color: "#FFFFFF",
+        label: function() {
+            return (this.uniqueID ? this.uniqueID + " - " : "") + (this.name || this.stream || "telemetry");
+        },
+        labelStyle: function() {
+            return (this.name)?"node_label_italic":"";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="kontakt-io-account">
+    
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-apikey"><i class="fa fa-lock"></i> Api Key</label>
+        <input type="password" id="node-config-input-apikey">
+        <input type="hidden" id="node-config-input-desc">
+    </div>
+
+    <div class="form-row">
+    <label for="node-config-input-environment"><i class="fa fa-globe"></i> Environment</label>
+        <select type="text" id="node-config-input-environment" style="width:70%;">
+            <option value="ovs.kontakt.io">Production</option>
+            <option value="acceptrtls.kontakt.io">Accept</option>
+            <option value="testrtls.kontakt.io">Test</option>
+        </select>
+    </div>
+    
+    
+</script>
+
+<script type="text/javascript">
+
+    RED.nodes.registerType('kontakt-io-account',{
+        category: 'config',
+        defaults: {
+            name: { value: "" },
+            environment: {value:"api", required:true},
+            desc: { value: "" }
+        },
+        credentials: {
+            apikey: {type: "password"}
+        },
+        label: function() {
+          return this.desc || this.name
+        },
+        oneditprepare: function () {
+          $("#node-config-input-apikey").change(function() {
+            var apikey = $( this ).val();
+            if(apikey !== "__PWRD__") {
+              $("#node-config-input-desc").val(apikey.substr(0, 4) + "(...)" + apikey.substr((apikey.length - 4), 4))
+            }
+          });
+        }
+    });
+</script>
