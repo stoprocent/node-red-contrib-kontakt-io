@@ -227,7 +227,9 @@ module.exports = function(RED) {
                     payload: ((node.trackingID && payload.length) === 1 ? payload[0]: payload)
                 };
 
-                node.send(msg);
+                if (Object.keys(msg.payload).length > 0) {
+                    node.send(msg);
+                }
             });
 
             if (this.account.connected) {
