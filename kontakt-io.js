@@ -14,18 +14,19 @@ module.exports = function(RED) {
     function AccountNode(n) {
         RED.nodes.createNode(this, n);
 
-        this.apikey         = this.credentials.apikey
-        this.environment    = n.environment;
-        this.name           = n.name;
-        this.connected      = false;
-        this.connecting     = false;
-        this.closing        = false;
-        this.subscriptions  = {};
-        this.users          = {};
+        this.apikey             = this.credentials.apikey
+        this.environment        = n.environment;
+        this.customURL          = n['custom-environment'];
+        this.name               = n.name;
+        this.connected          = false;
+        this.connecting         = false;
+        this.closing            = false;
+        this.subscriptions      = {};
+        this.users              = {};
 
         // Build Vars
         this.clientID       = 'kontakt_io_' + (1 + Math.random() * 4294967295).toString(16);
-        this.environmentURL = "mqtts://" + this.environment + ":8083";
+        this.environmentURL = (this.environment =="url" ? this.customURL : ("mqtts://" + this.environment + ":8083"));
 
         var node = this;
 

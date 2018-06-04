@@ -204,10 +204,20 @@
     <div class="form-row">
     <label for="node-config-input-environment"><i class="fa fa-globe"></i> Environment</label>
         <select type="text" id="node-config-input-environment" style="width:70%;">
-            <option value="ovs.kontakt.io">Production</option>
-            <option value="acceptrtls.kontakt.io">Accept</option>
-            <option value="testrtls.kontakt.io">Test</option>
+            <optgroup label="Kontakt.io">
+                <option value="ovs.kontakt.io">Production</option>
+                <option value="acceptrtls.kontakt.io">Accept</option>
+                <option value="testrtls.kontakt.io">Test</option>
+            </optgroup>
+            <option value="url">Custom URL ...</option>
         </select>
+    </div>
+    <div class="form-row" id="node-config-input-custom-environment-row">
+        <label for="node-config-input-custom-environment"><i class="fa fa-globe"></i> Custom URL</label>
+        <input type="text" id="node-config-input-custom-environment" placeholder="Custom URL">
+    </div>
+    <div class="form-tips">
+        When custom URL is used please use format: <strong>mqtt(s)://address:port</strong>
     </div>
     
     
@@ -220,6 +230,7 @@
         defaults: {
             name: { value: "" },
             environment: {value:"api", required:true},
+            "custom-environment": {value:""},
             desc: { value: "" }
         },
         credentials: {
@@ -233,6 +244,15 @@
             var apikey = $( this ).val();
             if(apikey !== "__PWRD__") {
               $("#node-config-input-desc").val(apikey.substr(0, 4) + "(...)" + apikey.substr((apikey.length - 4), 4))
+            }
+          });
+
+          $("#node-config-input-environment").change(function() {
+            if($("#node-config-input-environment").val() == "url") {
+                $("#node-config-input-custom-environment-row").show();
+            }
+            else {
+                $("#node-config-input-custom-environment-row").hide();   
             }
           });
         }
